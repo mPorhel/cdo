@@ -4814,6 +4814,14 @@ public class CDOTransactionImpl extends CDOViewImpl implements InternalCDOTransa
         {
           return;
         }
+        
+        if (!lockedObject.cdoWriteLock().isLocked())
+        {
+          // Server will only release locks if the current view is the owner.
+          // No need to put noise in the commit info with all prefetched lock states with no lock.
+          // TODO : check if the writeLockOption or the readLock checks are required.
+            return;
+        }
 
         idsToUnlock.add(id);
       });
