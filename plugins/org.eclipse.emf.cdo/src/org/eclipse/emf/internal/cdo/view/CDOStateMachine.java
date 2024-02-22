@@ -875,6 +875,9 @@ public final class CDOStateMachine extends FiniteStateMachine<CDOState, CDOEvent
 
         // Register object
         transaction.registerObject(object);
+
+        // TODO find a better way to reinit only the locks ?
+        transaction.remapObject(id);
       }
 
       transaction.registerAttached(object, !reattaching);
