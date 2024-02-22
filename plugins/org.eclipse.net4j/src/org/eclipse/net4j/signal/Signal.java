@@ -42,7 +42,7 @@ public abstract class Signal implements Runnable
    */
   public static final long NO_TIMEOUT = BufferInputStream.NO_TIMEOUT;
 
-  private static final boolean DISABLE_LOG_EXCEPTIONS = OMPlatform.INSTANCE.isProperty("org.eclipse.net4j.signal.Signal.disableLogExceptions");
+  private static final boolean DISABLE_LOG_EXCEPTIONS = OMPlatform.INSTANCE.isProperty("org.eclipse.net4j.signal.Signal.disableLogExceptions", true);
 
   private static final boolean SHORT_TO_STRING = OMPlatform.INSTANCE.isProperty("org.eclipse.net4j.signal.Signal.shortToString");
 
