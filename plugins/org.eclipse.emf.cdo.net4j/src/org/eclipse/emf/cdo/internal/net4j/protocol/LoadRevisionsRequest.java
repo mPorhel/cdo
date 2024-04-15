@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2012, 2014-2017, 2019, 2021, 2023 Eike Stepper (Loehne, Germany) and others.
+ * Copyright (c) 2010-2012, 2014-2017, 2019, 2021, 2023, 2024 Eike Stepper (Loehne, Germany) and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *    Eike Stepper - initial API and implementation
+ *    Maxime Porhel (Obeo) - Perf optimizations
  */
 package org.eclipse.emf.cdo.internal.net4j.protocol;
 
@@ -93,29 +94,31 @@ public class LoadRevisionsRequest extends CDOClientRequest<List<RevisionInfo>>
       boolean branching = session.getRepositoryInfo().isSupportingBranches();
       rememberedRevisions = new HashMap<>();
 
-      try
+      if (Boolean.getBoolean("org.eclipse.emf.cdo.net4j.prefetch.request.with.known.revision"))
       {
-        cache.forEachValidRevision(branchPoint, branching, r -> {
-          try
-          {
-            CDORevisionKey key = CDORevisionUtil.copyRevisionKey(r);
+        try
+        {
+          cache.forEachValidRevision(branchPoint, branching, r -> {
+            try
+            {
+              CDORevisionKey key = CDORevisionUtil.copyRevisionKey(r);
 
-            // Remember a strong reference prevents garbage collection.
-            rememberedRevisions.put(key, r);
+              // Remember a strong reference prevents garbage collection.
+              rememberedRevisions.put(key, r);
 
-            out.writeCDORevisionKey(key);
-          }
-          catch (IOException ex)
-          {
-            throw new IORuntimeException(ex);
-          }
-        });
+              out.writeCDORevisionKey(key);
+            }
+            catch (IOException ex)
+            {
+              throw new IORuntimeException(ex);
+            }
+          });
+        }
+        catch (IORuntimeException ex)
+        {
+          ex.rethrow();
+        }
       }
-      catch (IORuntimeException ex)
-      {
-        ex.rethrow();
-      }
-
       out.writeCDORevisionKey(null);
     }
 
