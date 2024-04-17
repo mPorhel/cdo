@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2012, 2015, 2016, 2018, 2019, 2022 Eike Stepper (Loehne, Germany) and others.
+ * Copyright (c) 2008-2012, 2015, 2016, 2018, 2019, 2022, 2024 Eike Stepper (Loehne, Germany) and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,11 @@
  *
  * Contributors:
  *    Eike Stepper - initial API and implementation
+ *    Obeo - Perf optimizations
  */
 package org.eclipse.emf.cdo.eresource.impl;
 
+import org.eclipse.emf.cdo.CDOState;
 import org.eclipse.emf.cdo.common.id.CDOID;
 import org.eclipse.emf.cdo.common.revision.CDOList;
 import org.eclipse.emf.cdo.common.util.CDODuplicateResourceException;
@@ -139,8 +141,22 @@ public class CDOResourceFolderImpl extends CDOResourceNodeImpl implements CDORes
         protected CDOResourceNode validate(int index, CDOResourceNode newNode)
         {
           String newPath = getPath() + CDOURIUtil.SEGMENT_SEPARATOR + newNode.getName();
-          CDOResourceFolderImpl.this.checkDuplicates(newPath);
 
+          if (newNode instanceof CDOResource 
+              && !((CDOResource)newNode).isLoaded() 
+              && CDOState.TRANSIENT.equals(newNode.cdoState())
+              && CDOState.NEW.equals(CDOResourceFolderImpl.this.cdoState()))
+          {
+            InternalCDOView view = cdoView();
+            if (view != null)
+            {
+              view.clearResourcePathCacheIfNecessary(null);
+            }
+          }
+          else
+          {
+            CDOResourceFolderImpl.this.checkDuplicates(newPath);
+          }
           return super.validate(index, newNode);
         }
       };
