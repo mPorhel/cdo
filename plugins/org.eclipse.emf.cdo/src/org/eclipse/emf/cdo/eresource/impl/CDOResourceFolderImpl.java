@@ -148,9 +148,10 @@ public class CDOResourceFolderImpl extends CDOResourceNodeImpl implements CDORes
               && CDOState.NEW.equals(CDOResourceFolderImpl.this.cdoState()))
           {
             InternalCDOView view = cdoView();
-            if (view != null)
+            if (view != null && !Boolean.getBoolean("org.eclipse.emf.cdo.eresource.cdofolder.validate.new.folder.transient.resource.child.clear.cache.skip"))
             {
-              view.clearResourcePathCacheIfNecessary(null);
+                view.clearResourcePathCacheIfNecessary(null);
+            
             }
           }
           else
