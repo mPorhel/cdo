@@ -121,6 +121,7 @@ public class AllConfigs extends ConfigTestSuite
     testClasses.add(WorkspaceTest.class);
     testClasses.add(XATransactionTest.class);
     testClasses.add(XRefTest.class);
+    testClasses.add(LockStatePrefetcherTest.class);
 
     // Bugzilla verifications
     testClasses.addAll(getBugzillaTests());
